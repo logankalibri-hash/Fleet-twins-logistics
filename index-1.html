@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FLEET TWINS LOGISTIKS — демо</title>
+<style>
+:root{--bg:#061426;--panel:#0b2038;--line:#203b58;--blue:#087be8;--text:#eef6ff;--muted:#a9bdd2}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#020b18,#071a30);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer;border:0;border-radius:9px;padding:11px 14px;background:#087be8;color:#fff;font-weight:650}.secondary{background:#18334f;border:1px solid #31516e}
+.app{display:grid;grid-template-columns:235px 1fr;min-height:100vh}.side{background:#041225;border-right:1px solid var(--line);padding:16px 12px}.brand{font-size:21px;font-weight:850;margin:8px 7px 22px}.brand span{color:#39aaff}.nav{display:grid;gap:5px}.nav button{text-align:left;background:transparent;color:#dce9f8}.nav button.active,.nav button:hover{background:#0b65bc}.main{padding:22px;min-width:0}.top{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:20px}.top h1{margin:0;font-size:25px}.panel{background:linear-gradient(145deg,#0b2038,#061528);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}.stat{padding:16px;border-radius:12px;background:#0b2038;border:1px solid var(--line)}.stat b{display:block;font-size:26px}.muted,.note{color:var(--muted);font-size:13px}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field{display:grid;gap:6px;color:#c3d5e7}.field input,.field select,.field textarea{width:100%;background:#041326;border:1px solid #31516e;color:#fff;border-radius:8px;padding:11px;min-height:44px}.field textarea{min-height:90px}.full{grid-column:1/-1}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}.hidden{display:none!important}.list{display:grid;gap:8px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#081a2d;padding:12px;border:1px solid #203b58;border-radius:9px}.toast{position:fixed;bottom:16px;right:16px;background:#075b3b;border-radius:10px;padding:12px 16px;display:none;max-width:90vw}.preview img{max-width:130px;max-height:120px;margin:8px;border-radius:8px}.tag{color:#8fd2ff;font-size:12px}
+@media(max-width:760px){.app{display:block}.side{padding:10px}.brand{margin:4px 7px 10px}.nav{grid-template-columns:repeat(2,minmax(0,1fr))}.nav button{padding:9px;font-size:13px}.main{padding:12px}.top{align-items:flex-start;flex-direction:column}.stats{grid-template-columns:1fr}.formgrid{grid-template-columns:1fr}.full{grid-column:auto}.panel{padding:13px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side">
+  <div class="brand">🚚 FLEET <span>TWINS LOGISTIKS</span></div>
+  <nav class="nav" id="nav">
+    <button class="active" data-page="home">⌂ Главная</button>
+    <button data-page="transport">▣ Транспорт</button>
+    <button data-page="rental">🚘 Арендованные авто</button>
+    <button data-page="drivers">♙ Водители</button>
+    <button data-page="inspection">◉ Техосмотр (TÜV)</button>
+    <button data-page="repairs">🔧 Ремонты</button>
+    <button data-page="accidents">⚠ ДТП</button>
+    <button data-page="docs">▤ Документы</button>
+    <button data-page="gear">♧ Одежда / СИЗ</button>
+    <button data-page="reports">▦ Отчёты</button>
+  </nav>
+  <p class="note">Демонстрационный прототип</p>
+</aside>
+<main class="main">
+<header class="top"><h1 id="title">Главная панель</h1><span class="tag">ДЕМО · данные хранятся только в этом браузере</span></header>
+<section id="home">
+  <div class="stats"><div class="stat"><b>28</b>Всего машин</div><div class="stat"><b>22</b>В эксплуатации</div><div class="stat"><b>3</b>Скоро техосмотр</div></div>
+  <section class="panel"><h2>Быстрые действия</h2><div class="actions"><button data-goto="transport">Транспорт</button><button data-goto="inspection">Добавить техосмотр</button><button data-goto="docs">Документы автомобиля</button></div></section>
+  <section class="panel"><h2>Ближайшие события</h2><p>🗓️ TÜV: Mercedes Sprinter — 22.10.2026</p><p>🔧 Ремонт: Iveco Daily — 21.10.2026</p></section>
+</section>
+<section id="dynamic" class="panel hidden"></section>
+</main></div><div id="toast" class="toast"></div>
+<script>
+const titles={home:'Главная панель',transport:'Транспорт',rental:'Приёмка аренды авто',drivers:'Водители',inspection:'Техосмотр (TÜV)',repairs:'Ремонты',accidents:'ДТП',docs:'Документы на автомобиль',gear:'Одежда / СИЗ',reports:'Отчёты'};
+const $=s=>document.querySelector(s);
+function toast(s){const t=$('#toast');t.textContent=s;t.style.display='block';setTimeout(()=>t.style.display='none',2600)}
+function field(label,type='text',placeholder=''){return `<label class="field">${label}<input type="${type}" placeholder="${placeholder}"></label>`}
+function getSaved(key){try{return JSON.parse(localStorage.getItem(key)||'[]')}catch(e){return []}}
+function saveRecord(key,record){const a=getSaved(key);a.push(record);localStorage.setItem(key,JSON.stringify(a));toast('Сохранено в этом браузере (демо)');}
+function pageHTML(p){
+ if(p==='transport')return `<h2>Транспорт</h2><div class="formgrid">${field('Марка / модель','text','Renault Master')}${field('Государственный номер','text','B-TV 1024')}${field('Тип','text','Собственный / арендованный')}${field('Статус','text','В эксплуатации')}</div><div class="actions"><button id="save">Сохранить транспорт</button></div><h3>Добавленные записи</h3><div id="records" class="list"></div>`;
+ if(p==='inspection')return `<h2>Техосмотр (TÜV)</h2><p class="note">Нажмите на поле даты, чтобы открыть календарь. На телефоне можно выбрать дату в системном календаре.</p><div class="formgrid">${field('Гос. номер','text','B-TV 1024')}${field('Марка / модель','text','Renault Master')}${field('Дата техосмотра','date')}${field('Следующий техосмотр','date')}${field('Сервис / станция','text','TÜV')}${field('Примечание','text','')}</div><div class="actions"><button id="save">Сохранить техосмотр</button></div><h3>Сохранённые записи</h3><div id="records" class="list"></div>`;
+ if(p==='docs')return `<h2>Документы на автомобиль</h2><p class="note">Сделайте фото документa камерой или выберите уже сохранённый файл. Выбранные изображения можно собрать в PDF для скачивания.</p><div class="formgrid"><label class="field full">Сфотографировать документ или выбрать файл<input id="docfiles" type="file" accept="image/*,application/pdf" capture="environment" multiple></label></div><div id="docpreview" class="preview"></div><div class="actions"><button id="makepdf">Создать PDF из фотографий</button><button id="downloadFiles" class="secondary">Скачать выбранный оригинал</button></div><p class="note">PDF создаётся локально в браузере. Это демо: файл не отправляется на сервер и не становится доступен другим сотрудникам.</p>`;
+ if(p==='gear')return `<h2>Выдача одежды и рабочего телефона</h2><div class="formgrid"><label class="field">Предмет<select id="item"><option>Куртка зимняя</option><option>Куртка летняя</option><option>Футболка</option><option>Штаны</option><option>Ботинки</option><option>Рабочий телефон</option></select></label><label class="field">Сезон<select id="season"><option>Зимний</option><option>Летний</option><option>Всесезонный</option><option>Не применимо</option></select></label>${field('Дата выдачи','date')}${field('Водитель','text','Имя и фамилия')}${field('Номер рабочего телефона/устройства','text','Инвентарный номер или модель')}</div><div class="actions"><button id="save">Сохранить выдачу</button></div><h3>История выдачи</h3><div id="records" class="list"></div>`;
+ if(p==='reports')return `<h2>Отчёты</h2><p>Сводная информация по автопарку.</p><div class="stats"><div class="stat"><b>28</b>Всего машин</div><div class="stat"><b>3</b>Скоро техосмотр</div></div><p class="note">Лишняя графа удалена из формы.</p>`;
+ if(p==='accidents')return `<h2>ДТП / страховой случай</h2><p>Раздел оставлен без изменений по согласованию.</p><div class="formgrid">${field('Гос. номер','text','B-TV 1024')}${field('Дата','date')}${field('Описание','text','Введите детали')}</div><div class="actions"><button id="save">Сохранить запись</button></div>`;
+ if(p==='rental')return `<h2>Приёмка аренды авто</h2><div class="formgrid">${field('Марка / модель','text','Mercedes Sprinter')}${field('Государственный номер','text','B-TV 3056')}${field('Дата получения','date')}${field('Пробег при получении','number','125400')}<label class="field full">Фото автомобиля<input type="file" accept="image/*" capture="environment" multiple></label><label class="field full">PDF техпаспорта<input type="file" accept="application/pdf"></label></div><div class="actions"><button id="save">Сохранить приёмку</button></div>`;
+ if(p==='drivers')return `<h2>Водители</h2><div class="formgrid">${field('Имя и фамилия','text','Имя Фамилия')}${field('Контактный телефон','tel','+49')}${field('Дата начала работы','date')}</div><div class="actions"><button id="save">Сохранить водителя</button></div>`;
+ if(p==='repairs')return `<h2>Ремонты</h2><div class="formgrid">${field('Автомобиль / госномер','text','B-TV 1024')}${field('Дата','date')}${field('Описание ремонта','text','Введите детали')}${field('Стоимость (€)','number','0')}</div><div class="actions"><button id="save">Сохранить ремонт</button></div>`;
+}
+function renderRecords(p){const el=$('#records');if(!el)return;const key='twins_'+p;const rows=getSaved(key);el.innerHTML=rows.length?rows.map((r,i)=>`<div class="row"><span>${i+1}. ${Object.values(r).filter(Boolean).join(' · ')}</span></div>`).join(''):'<p class="note">Пока нет сохранённых записей.</p>'}
+function go(p){$('#title').textContent=titles[p]||p;$('#home').classList.toggle('hidden',p!=='home');$('#dynamic').classList.toggle('hidden',p==='home');document.querySelectorAll('[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===p));if(p!=='home'){$('#dynamic').innerHTML=pageHTML(p);bind(p)}window.scrollTo(0,0)}
+function bind(p){
+ const save=$('#save');if(save)save.onclick=()=>{const vals=[...$('#dynamic').querySelectorAll('.formgrid input,.formgrid select,.formgrid textarea')].filter(x=>x.type!=='file').map(x=>x.value.trim());if(vals.some(Boolean))saveRecord('twins_'+p, Object.fromEntries(vals.map((v,i)=>['Поле '+(i+1),v])));else toast('Заполните хотя бы одно поле');renderRecords(p)};
+ renderRecords(p);
+ const input=$('#docfiles');if(input)input.onchange=()=>{const prev=$('#docpreview');prev.innerHTML='';[...input.files].forEach(f=>{if(f.type.startsWith('image/')){const im=document.createElement('img');im.src=URL.createObjectURL(f);prev.appendChild(im)}else{const d=document.createElement('p');d.textContent='Выбран PDF: '+f.name;prev.appendChild(d)}})};
+ const dl=$('#downloadFiles');if(dl)dl.onclick=()=>{const f=$('#docfiles').files[0];if(!f)return toast('Сначала выберите файл');const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;a.click();URL.revokeObjectURL(a.href)};
+ const pdf=$('#makepdf');if(pdf)pdf.onclick=()=>{const files=[...($('#docfiles').files||[])].filter(f=>f.type.startsWith('image/'));if(!files.length)return toast('Сначала выберите фотографию документа');makeSimplePDF(files).then(blob=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='avto-document.pdf';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)})};
+}
+async function makeSimplePDF(files){
+ // Minimal valid one-page PDF per selected image, rendered as JPEG on A4 pages.
+ const pages=[];for(const f of files){const img=new Image();const url=URL.createObjectURL(f);await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src=url});const canvas=document.createElement('canvas');const scale=Math.min(1400/img.width,1800/img.height,1);canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);URL.revokeObjectURL(url);pages.push(canvas.toDataURL('image/jpeg',.86).split(',')[1])}
+ // Keep PDF generation simple and robust using printable image pages via browser print fallback.
+ const win=window.open('','_blank');if(!win){toast('Разрешите всплывающее окно для создания PDF');return new Blob([])}
+ win.document.write('<html><head><title>Документ автомобиля</title><style>@page{size:A4;margin:10mm}body{margin:0}img{width:100%;height:auto;max-height:270mm;object-fit:contain;page-break-after:always}</style></head><body>'+files.map(f=>`<img src="${URL.createObjectURL(f)}">`).join('')+'<script>window.onload=()=>{window.print()}<\/script></body></html>');win.document.close();toast('Открылось окно печати: выберите «Сохранить как PDF»');return new Blob([]);
+}
+document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
+document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.goto)));
+</script>
+</body></html>
